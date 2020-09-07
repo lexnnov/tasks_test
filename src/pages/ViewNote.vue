@@ -1,7 +1,7 @@
 <template>
     <div class="container">
 
-        <btn :onClick="goHome" title="BACK TO NOTES"/>
+        <btn :onClick="goHome" title="BACK TO TASKS"/>
 
         <note
             :note="note"
@@ -43,8 +43,8 @@
 				this.$store.dispatch('setModal', {
 					modalOpen: true,
 					data: {
-						title: 'REMOVE THE NOTE?',
-						content: 'Are you sure you want to delete the note?',
+						title: 'REMOVE THE TASK?',
+						content: 'Are you sure you want to delete the task?',
 						controls: [ 'CANCEL', 'REMOVE' ]
 					}
 				})
@@ -53,9 +53,6 @@
 			confirmRemove() {
 				this.$store.dispatch('removeNote', this.note.id)
 				this.$router.push('/')
-			},
-
-			closeModal() {
 			}
 		}
 	}

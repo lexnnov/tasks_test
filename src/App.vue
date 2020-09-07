@@ -35,6 +35,7 @@
 </script>
 
 <style lang="scss">
+
     .fade-enter-active,
     .fade-leave-active {
         transition: opacity 300ms

@@ -2,23 +2,29 @@
     <div :class="[readonly ? 'task readOnly' : 'task']">
         <div class="checkbox">
             <input
-                    @click="change"
-                    class="custom-checkbox"
-                    type="checkbox"
-                    :id="task.id"
-                    name="color-1"
-                    value="indigo"
-                    v-model="task.state"
-                    :disabled="readonly"
+                class="custom-checkbox"
+                type="checkbox"
+                v-model="task.state"
+                :id="task.id"
+                :disabled="readonly"
+                @click="change"
             >
             <label :for="task.id">
+
+                <div class="blockTask" v-if="readonly"></div>
+
                 <input
-                        placeholder="введите текст задания"
-                        :disabled="readonly"
-                        :class="{ inactive: complete }"
-                        v-model="task.title"
+                    v-if="!this.view"
+                    placeholder="Enter the text of the task"
+                    :disabled="readonly"
+                    :class="task.title ? { inactive: complete } : ''"
+                    v-model="task.title"
                 >
+
+                <div v-else :class="{ inactive: complete }"> {{task.title}} </div>
+
             </label>
+
         </div>
 
         <some-icon v-if="!readonly && needRemoveBtn" @click="remove" class="removeTask"/>
@@ -47,7 +53,10 @@
             },
             removeTask: {
                 type: Function
-            }
+            },
+            view: {
+                type: Boolean
+            },
         },
         data: function () {
             return {
@@ -57,19 +66,24 @@
 
         methods: {
             change() {
-                // this.$emit('setTaskState', this.task)
                 this.complete = !this.complete
             },
             remove() {
                 this.$emit('removeTask', this.task)
             }
+
         }
     }
 </script>
 
 <style lang="scss" scoped>
 
-
+    .blockTask {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
     .task {
         display: flex;
         align-items: center;
@@ -97,10 +111,8 @@
         display: block;
         width: 100%;
         border: none;
-        /*border-bottom: 1px solid #757575;*/
         box-sizing: border-box;
-
-
+        background-color: white;
     }
 
     input::placeholder {
@@ -161,6 +173,10 @@
 
     .inactive {
         text-decoration: line-through;
+        input {
+            user-select: none;
+
+        }
     }
 
     .content {

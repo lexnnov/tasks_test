@@ -1,46 +1,57 @@
 <template>
     <div :class="[readonly ? 'note readOnly' : 'note']">
+
         <div class="note-title" v-if="note.type == 'group'">
-            <input  placeholder="GROUP TITLE" :disabled="readonly" v-model="note.title"
-                   type="text"/>
+
+            <input
+                placeholder="GROUP TITLE"
+                type="text"
+                :disabled="readonly"
+                v-model="note.title"
+                @input="inputChange"
+            />
+
         </div>
 
         <div class="note-content">
-            <draggable :move="note.type == 'group' ? ()=> {return true} : ()=> {return false}"
-                       v-model="note.tasks"
-                       :options="note.type == 'group' ? {group:'people'} : {group:'people1'}"
-                       @start="drag=true"
-                       @end="drag=false"
-                       @change="moved"
+
+            <draggable
+                class="list-group"
+                v-model="note.tasks"
+                :move="setDraggableMove()"
+                :options="setDraggableOptions()"
+                @start="drag=true"
+                @end="drag=false"
+                @change="moved"
             >
-                <transition-group name="fade">
+                <transition-group name="fade" class="list-group" v-if="note.tasks.length">
                     <task
-                            v-for="task in note.tasks"
-                            :key="task.id"
-                            :readonly="readonly"
-                            :task="task"
-                            :needRemoveBtn="note.type == 'group' ? true : false"
-                            @removeTask="removeTask"
+                        v-for="task in note.tasks"
+                        :key="task.id"
+                        :readonly="readonly"
+                        :task="task"
+                        :view="view"
+                        :needRemoveBtn="note.type === 'group'"
+                        @removeTask="removeTask"
                     />
                 </transition-group>
+
+                <transition-group name="fade" class="list-group" v-else>
+                    <div :key="`notasks`">NO TASKS</div>
+                </transition-group>
+
             </draggable>
 
         </div>
 
         <div class="note-footer">
             <btn
-                    v-for="control in controls"
-                    :key="control"
-                    :color="control == 'REMOVE' ? 'c51111' : ''"
-                    :title="control"
-                    :onClick="
-                    control == 'EDIT' ? editNote :
-                    control == 'VIEW' ? viewNote :
-                    control == 'REMOVE' ? removeNote :
-                    control == 'SAVE' ? saveNote :
-                    control == 'ADD TASK' ? addTask :
-                    createNote
-            "/>
+                v-for="control in controls"
+                :key="control"
+                :color="control === 'REMOVE' ? 'c51111' : ''"
+                :title="control"
+                :onClick="setNoteControls(control)"
+            />
         </div>
 
     </div>
@@ -72,15 +83,6 @@
                 required: true
             }
         },
-        computed: {
-            // Отображать на главной только 3 задачи
-            taskFilter: function () {
-                if (this.readonly && !this.view)
-                    return this.note.tasks.slice(0, 3)
-                else
-                    return this.note.tasks
-            }
-        },
 
         methods: {
 
@@ -92,7 +94,7 @@
                 this.$emit('viewNote', this.note)
             },
             createNote() {
-                this.$emit('createNote', this.note.type)
+                this.$emit('createNote')
             },
             saveNote() {
                 this.$emit('saveNote', this.note.id)
@@ -109,14 +111,40 @@
                 this.$emit('removeTask', task)
             },
 
+            inputChange() {
+                this.$emit('inputChange')
+            },
+
             moved() {
                 this.$emit('movedTask')
+            },
+
+            setDraggableOptions() {
+                return this.note.type === 'group' ?  {group:'group'} : {group:'task', disabled: true}
+            },
+            setDraggableMove() {
+                return this.note.type === 'group' ? this.note.tasks.length ? ()=> {return true} : ()=> {return false} : ()=> {return false}
+            },
+            setNoteControls(control) {
+               return control === 'EDIT' ? this.editNote :
+                    control === 'VIEW' ? this.viewNote :
+                    control === 'REMOVE' ? this.removeNote :
+                    control === 'SAVE' ? this.saveNote :
+                    control === 'ADD TASK' ? this.addTask :
+                    this.createNote
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
+
+    .list-group {
+        min-height: 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
 
     .readOnly input[type=text] {
         border: none;
@@ -171,8 +199,8 @@
 
         &-content {
             flex: 1 0 auto;
-            padding: 20px;
             transition: all 2s;
+            width: 100%;
         }
 
         &-footer {

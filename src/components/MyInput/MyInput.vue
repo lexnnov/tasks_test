@@ -1,5 +1,5 @@
 <template>
-    <input v-model="val1" class="myInput" aria-placeholder="asdasdasd" @keyup="$emit('update:value', val1)"/>
+    <input v-model="val" class="myInput" aria-placeholder="asdasdasd" @keyup="$emit('update:value', val)"/>
 </template>
 
 <script>
@@ -12,14 +12,14 @@
         },
         data: function () {
             return {
-                val1: this.value
+                val: this.value
             }
         }
 
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     input {
         font-size: 18px;
         padding: 10px 10px 10px 5px;
