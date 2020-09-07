@@ -28,7 +28,8 @@
 			confirmRemove() {
 				this.$store.dispatch('removeNote', this.removeId)
 				this.$store.dispatch('setModal', {modalOpen: false})
-				this.$router.push('/')
+
+                if (this.$route.path !== '/') this.$router.push('/')
 			}
 		}
 	}

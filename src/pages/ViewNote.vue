@@ -49,10 +49,6 @@
 					}
 				})
 				this.$store.dispatch('setNoteIdForRemove', removeTask)
-			},
-			confirmRemove() {
-				this.$store.dispatch('removeNote', this.note.id)
-				this.$router.push('/')
 			}
 		}
 	}
